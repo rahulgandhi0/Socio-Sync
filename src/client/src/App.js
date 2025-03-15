@@ -13,8 +13,10 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [events, setEvents] = useState([]);
   const [images, setImages] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [caption, setCaption] = useState('');
+
+  const MAX_IMAGES = 8;
 
   const handleEventSelect = (event) => {
     setSelectedEvent(event);
@@ -22,8 +24,23 @@ function App() {
   };
 
   const handleImageSelect = (image) => {
-    setSelectedImage(image);
-    setStep(3);
+    setSelectedImages(prevSelectedImages => {
+      // Check if image is already selected
+      const isAlreadySelected = prevSelectedImages.some(img => img.link === image.link);
+      
+      if (isAlreadySelected) {
+        // If already selected, remove it
+        return prevSelectedImages.filter(img => img.link !== image.link);
+      } else if (prevSelectedImages.length < MAX_IMAGES) {
+        // If not selected and under the limit, add it
+        return [...prevSelectedImages, image];
+      } else {
+        // If at the limit, show error
+        setError(`You can select a maximum of ${MAX_IMAGES} images`);
+        setTimeout(() => setError(''), 3000);
+        return prevSelectedImages;
+      }
+    });
   };
 
   const handleCaptionGenerated = (generatedCaption) => {
@@ -39,8 +56,23 @@ function App() {
   const handleReset = () => {
     setStep(1);
     setSelectedEvent(null);
-    setSelectedImage(null);
+    setSelectedImages([]);
     setCaption('');
+  };
+
+  const handleProceedToCaption = () => {
+    if (selectedImages.length > 0) {
+      setStep(3);
+    } else {
+      setError('Please select at least one image');
+      setTimeout(() => setError(''), 3000);
+    }
+  };
+
+  const removeSelectedImage = (image) => {
+    setSelectedImages(prevSelectedImages => 
+      prevSelectedImages.filter(img => img.link !== image.link)
+    );
   };
 
   return (
@@ -93,7 +125,15 @@ function App() {
           <>
             <div className="navigation">
               <button className="secondary-btn" onClick={handleBack}>Back to Events</button>
+              <button 
+                className="primary-btn" 
+                onClick={handleProceedToCaption} 
+                disabled={selectedImages.length === 0}
+              >
+                Continue with {selectedImages.length} {selectedImages.length === 1 ? 'Image' : 'Images'}
+              </button>
             </div>
+            
             <div className="selected-event card">
               <h2>{selectedEvent.title}</h2>
               <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
@@ -101,21 +141,61 @@ function App() {
                 <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
               )}
             </div>
-            <ImageSearch 
-              eventTitle={selectedEvent.title} 
-              setImages={setImages} 
-              setLoading={setLoading} 
-              setError={setError} 
-            />
-            {loading ? (
-              <div className="loading"></div>
-            ) : (
-              <ImageList images={images} onSelectImage={handleImageSelect} />
-            )}
+            
+            <div className="image-selection-layout">
+              <div className="image-selection-main">
+                <ImageSearch 
+                  eventTitle={selectedEvent.title} 
+                  setImages={setImages} 
+                  setLoading={setLoading} 
+                  setError={setError} 
+                />
+                
+                {loading ? (
+                  <div className="loading"></div>
+                ) : (
+                  <ImageList 
+                    images={images} 
+                    selectedImages={selectedImages}
+                    onSelectImage={handleImageSelect} 
+                    maxImages={MAX_IMAGES}
+                  />
+                )}
+              </div>
+              
+              {selectedImages.length > 0 && (
+                <div className="image-selection-sidebar">
+                  <div className="selected-images-preview card">
+                    <h3>
+                      Selected Images 
+                      <span className="selected-images-count">{selectedImages.length}/{MAX_IMAGES}</span>
+                    </h3>
+                    <div className="selected-images-grid">
+                      {selectedImages.map((image, index) => (
+                        <div key={index} className="selected-image-thumbnail">
+                          <img src={image.link} alt={image.title} />
+                          <button 
+                            className="remove-image-btn" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeSelectedImage(image);
+                            }}
+                            title="Remove image"
+                          >
+                            ✕
+                          </button>
+                          <div className="checkmark-indicator">✓</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         )}
 
-        {step === 3 && selectedEvent && selectedImage && (
+        {step === 3 && selectedEvent && selectedImages.length > 0 && (
           <>
             <div className="navigation">
               <button className="secondary-btn" onClick={handleBack}>Back to Images</button>
@@ -129,14 +209,22 @@ function App() {
                   <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
                 )}
               </div>
-              <div className="selected-image card">
-                <h3>Selected Image</h3>
-                <img src={selectedImage.link} alt={selectedImage.title} />
+              <div className="selected-images-grid-container card">
+                <h3>Selected Images</h3>
+                <div className="selected-images-grid">
+                  {selectedImages.map((image, index) => (
+                    <div key={index} className="selected-image-thumbnail">
+                      <img src={image.link} alt={image.title} />
+                      <div className="checkmark-indicator">✓</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <CaptionGenerator 
               event={selectedEvent} 
-              image={selectedImage} 
+              image={selectedImages[0]} // Using the first image for caption generation
+              images={selectedImages}
               onCaptionGenerated={handleCaptionGenerated} 
               setLoading={setLoading} 
               setError={setError} 

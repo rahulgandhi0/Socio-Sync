@@ -95,6 +95,19 @@ main {
   margin-top: 10px;
 }
 
+.selected-images-grid-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.selected-images-grid-container h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
 .caption-box {
   background-color: #f8f9fa;
   border-radius: 4px;
@@ -102,6 +115,51 @@ main {
   margin: 15px 0;
   font-size: 18px;
   line-height: 1.6;
+}
+
+/* Image selector in CaptionGenerator */
+.image-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image-option {
+  position: relative;
+  height: 80px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-option.selected {
+  border-color: #5c6bc0;
+  box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.3);
+}
+
+.image-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #5c6bc0;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 @media (max-width: 768px) {
@@ -128,6 +186,14 @@ main {
     margin-right: 10px;
     margin-bottom: 0;
   }
+  
+  .image-selector {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  }
+  
+  .image-option {
+    height: 60px;
+  }
 }
 
 .or-divider {
@@ -151,4 +217,34 @@ main {
   font-size: 14px;
   text-transform: uppercase;
   background: #fff;
+}
+
+/* Image selection layout */
+.image-selection-layout {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.image-selection-main {
+  grid-column: 1;
+}
+
+.image-selection-sidebar {
+  grid-column: 2;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+}
+
+@media (max-width: 992px) {
+  .image-selection-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-selection-main,
+  .image-selection-sidebar {
+    grid-column: 1;
+  }
 } 
