@@ -37,6 +37,17 @@ export const getCategories = async () => {
   }
 };
 
+// Scraper API calls
+export const scrapeEventbriteUrl = async (url) => {
+  try {
+    const response = await api.post('/api/scraper/eventbrite', { url });
+    return response.data;
+  } catch (error) {
+    console.error('Error scraping Eventbrite URL:', error);
+    throw error;
+  }
+};
+
 // Image API calls
 export const getImages = async (query, aspectRatio, quality) => {
   try {

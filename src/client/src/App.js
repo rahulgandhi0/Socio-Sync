@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import EventSearch from './components/EventSearch';
+import EventScraper from './components/EventScraper';
 import EventList from './components/EventList';
 import ImageSearch from './components/ImageSearch';
 import ImageList from './components/ImageList';
@@ -97,6 +98,20 @@ function App() {
               setLoading={setLoading} 
               setError={setError} 
             />
+            
+            <div className="or-divider">
+              <span>OR</span>
+            </div>
+            
+            <EventScraper
+              onEventScraped={(event) => {
+                setEvents([event]);
+                handleEventSelect(event);
+              }}
+              setLoading={setLoading}
+              setError={setError}
+            />
+            
             {loading ? (
               <div className="loading"></div>
             ) : (
