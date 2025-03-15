@@ -9,34 +9,6 @@ const api = axios.create({
   },
 });
 
-// Event API calls
-export const getEvents = async (city, startDate, endDate, category) => {
-  try {
-    const response = await api.get('/api/events/search', {
-      params: {
-        city,
-        startDate,
-        endDate,
-        category,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    throw error;
-  }
-};
-
-export const getCategories = async () => {
-  try {
-    const response = await api.get('/api/events/categories');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    throw error;
-  }
-};
-
 // Scraper API calls
 export const scrapeEventbriteUrl = async (url) => {
   try {

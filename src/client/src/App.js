@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
-import EventSearch from './components/EventSearch';
 import EventScraper from './components/EventScraper';
 import EventList from './components/EventList';
 import ImageSearch from './components/ImageSearch';
 import ImageList from './components/ImageList';
 import CaptionGenerator from './components/CaptionGenerator';
-import { getCategories } from './services/api';
 
 function App() {
   const [step, setStep] = useState(1);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -18,23 +15,6 @@ function App() {
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [caption, setCaption] = useState('');
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        const data = await getCategories();
-        setCategories(data);
-      } catch (err) {
-        setError('Failed to load event categories. Please try again later.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   const handleEventSelect = (event) => {
     setSelectedEvent(event);
@@ -92,17 +72,6 @@ function App() {
 
         {step === 1 && (
           <>
-            <EventSearch 
-              categories={categories} 
-              setEvents={setEvents} 
-              setLoading={setLoading} 
-              setError={setError} 
-            />
-            
-            <div className="or-divider">
-              <span>OR</span>
-            </div>
-            
             <EventScraper
               onEventScraped={(event) => {
                 setEvents([event]);

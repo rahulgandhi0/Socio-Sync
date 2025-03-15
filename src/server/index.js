@@ -4,7 +4,6 @@ const cors = require('cors');
 const path = require('path');
 
 // Import routes
-const eventbriteRoutes = require('./routes/eventbrite');
 const googleImagesRoutes = require('./routes/googleImages');
 const gptRoutes = require('./routes/gpt');
 const scraperRoutes = require('./routes/eventbriteScraper');
@@ -18,7 +17,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Routes
-app.use('/api/events', eventbriteRoutes);
 app.use('/api/images', googleImagesRoutes);
 app.use('/api/captions', gptRoutes);
 app.use('/api/scraper', scraperRoutes);

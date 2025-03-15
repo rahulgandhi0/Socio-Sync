@@ -38,15 +38,17 @@ function EventScraper({ onEventScraped, setLoading, setError }) {
   };
 
   return (
-    <div className="event-scraper">
-      <h3>Scrape Eventbrite URL</h3>
+    <div className="event-scraper card">
+      <h2>Find an Event</h2>
       <p className="scraper-description">
-        Paste an Eventbrite event URL to extract event details directly.
+        Paste an Eventbrite event URL to extract event details and create social media content.
       </p>
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
+          <label htmlFor="eventbrite-url">Eventbrite Event URL</label>
           <input
+            id="eventbrite-url"
             type="url"
             placeholder="https://www.eventbrite.com/e/event-name-tickets-123456789"
             value={url}
@@ -65,8 +67,13 @@ function EventScraper({ onEventScraped, setLoading, setError }) {
       </form>
       
       <div className="scraper-note">
-        <p><strong>Note:</strong> This feature extracts data directly from Eventbrite pages. 
-        Use it for events that don't appear in the search results.</p>
+        <p><strong>How it works:</strong> This tool extracts event information directly from Eventbrite event pages. 
+        Simply copy and paste the URL of any Eventbrite event to get started.</p>
+        <p><strong>Example URLs:</strong></p>
+        <ul>
+          <li>https://www.eventbrite.com/e/concert-name-tickets-123456789</li>
+          <li>https://www.eventbrite.com/e/conference-name-tickets-987654321</li>
+        </ul>
       </div>
     </div>
   );
