@@ -28,7 +28,7 @@ const EventList = ({ events, onSelectEvent }) => {
               </p>
               {event.venue && (
                 <p className="event-location">
-                  {event.venue.name}, {event.venue.city}
+                  {event.venue.name}{event.venue.city ? `, ${event.venue.city}` : ''}
                 </p>
               )}
               <button className="primary-btn select-btn">Select Event</button>

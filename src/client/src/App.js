@@ -129,7 +129,7 @@ function App() {
               <h2>{selectedEvent.title}</h2>
               <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
               {selectedEvent.venue && (
-                <p><strong>Location:</strong> {selectedEvent.venue.name}, {selectedEvent.venue.city}</p>
+                <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
               )}
             </div>
             <ImageSearch 
@@ -157,7 +157,7 @@ function App() {
                 <h2>{selectedEvent.title}</h2>
                 <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
                 {selectedEvent.venue && (
-                  <p><strong>Location:</strong> {selectedEvent.venue.name}, {selectedEvent.venue.city}</p>
+                  <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
                 )}
               </div>
               <div className="selected-image card">
