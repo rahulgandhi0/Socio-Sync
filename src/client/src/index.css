@@ -1,3 +1,11 @@
+:root {
+  --gradient-start: #8B5CF6;  /* Purple */
+  --gradient-middle: #EC4899;  /* Pink */
+  --gradient-end: #4361ee;    /* Blue */
+  --primary-color: #8B5CF6;   /* Purple for solid colors */
+  --primary-hover: #7C3AED;   /* Darker purple for hover states */
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -58,12 +66,15 @@ input, select, textarea {
 }
 
 .primary-btn {
-  background-color: #4361ee;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
   color: white;
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
 }
 
 .primary-btn:hover {
-  background-color: #3a56d4;
+  background-size: 150% 150%;
+  filter: brightness(1.1);
 }
 
 .secondary-btn {
@@ -97,7 +108,7 @@ input, select, textarea {
   width: 30px;
   height: 30px;
   border: 5px solid #f3f3f3;
-  border-top: 5px solid #4361ee;
+  border-top: 5px solid var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -105,4 +116,10 @@ input, select, textarea {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 } 

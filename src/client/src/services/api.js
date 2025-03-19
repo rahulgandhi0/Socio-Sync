@@ -9,13 +9,43 @@ const api = axios.create({
   },
 });
 
-// Scraper API calls
-export const scrapeEventbriteUrl = async (url) => {
+// Event API calls
+export const getCities = async () => {
   try {
-    const response = await api.post('/api/scraper/eventbrite', { url });
+    const response = await api.get('/api/events/cities');
     return response.data;
   } catch (error) {
-    console.error('Error scraping Eventbrite URL:', error);
+    console.error('Error getting cities:', error);
+    throw error;
+  }
+};
+
+export const getCategories = async () => {
+  try {
+    const response = await api.get('/api/events/categories');
+    return response.data;
+  } catch (error) {
+    console.error('Error getting categories:', error);
+    throw error;
+  }
+};
+
+export const searchEvents = async (params) => {
+  try {
+    const response = await api.post('/api/events/search', params);
+    return response.data;
+  } catch (error) {
+    console.error('Error searching events:', error);
+    throw error;
+  }
+};
+
+export const getEventById = async (eventId) => {
+  try {
+    const response = await api.get(`/api/events/${eventId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting event details:', error);
     throw error;
   }
 };
@@ -24,11 +54,7 @@ export const scrapeEventbriteUrl = async (url) => {
 export const getImages = async (query, aspectRatio, quality) => {
   try {
     const response = await api.get('/api/images/search', {
-      params: {
-        query,
-        aspectRatio,
-        quality,
-      },
+      params: { query, aspectRatio, quality }
     });
     return response.data;
   } catch (error) {
@@ -40,10 +66,7 @@ export const getImages = async (query, aspectRatio, quality) => {
 // Caption API calls
 export const generateCaption = async (data, type) => {
   try {
-    const response = await api.post('/api/captions/generate', {
-      data,
-      type,
-    });
+    const response = await api.post('/api/captions/generate', { data, type });
     return response.data;
   } catch (error) {
     console.error('Error generating caption:', error);

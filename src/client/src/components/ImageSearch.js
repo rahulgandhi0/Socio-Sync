@@ -5,7 +5,6 @@ import './ImageSearch.css';
 const ImageSearch = ({ eventTitle, setImages, setLoading, setError }) => {
   const [query, setQuery] = useState(eventTitle || '');
   const [aspectRatio, setAspectRatio] = useState('wide');
-  const [quality, setQuality] = useState('high');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +17,7 @@ const ImageSearch = ({ eventTitle, setImages, setLoading, setError }) => {
     try {
       setLoading(true);
       setError('');
-      const images = await getImages(query, aspectRatio, quality);
+      const images = await getImages(query, aspectRatio, 'high');
       setImages(images);
       
       if (images.length === 0) {
@@ -63,15 +62,8 @@ const ImageSearch = ({ eventTitle, setImages, setLoading, setError }) => {
           </div>
           
           <div className="form-group">
-            <label htmlFor="quality">Image Quality</label>
-            <select
-              id="quality"
-              value={quality}
-              onChange={(e) => setQuality(e.target.value)}
-            >
-              <option value="high">High (Photos)</option>
-              <option value="medium">Medium (Clipart)</option>
-            </select>
+            <label>Image Quality</label>
+            <div className="quality-display">High Quality Photos Only</div>
           </div>
         </div>
         

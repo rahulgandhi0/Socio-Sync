@@ -24,7 +24,16 @@ const ImageList = ({ images, selectedImages = [], onSelectImage, maxImages = 8 }
               onClick={() => onSelectImage(image)}
             >
               <div className="image-container">
-                <img src={image.link} alt={image.title} />
+                <img 
+                  src={image.link} 
+                  alt={image.title} 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/400x400?text=Image+Unavailable';
+                    // Mark image as broken
+                    image.broken = true;
+                  }}
+                />
                 {isSelected && (
                   <>
                     <div className="selected-overlay"></div>
@@ -35,7 +44,10 @@ const ImageList = ({ images, selectedImages = [], onSelectImage, maxImages = 8 }
               <div className="image-details">
                 <h3>{image.title}</h3>
                 <p className="image-dimensions">
-                  {image.width} x {image.height}
+                  {image.width} x {image.height} 
+                  {image.width && image.height && (
+                    <span> (Ratio: {(image.width / image.height).toFixed(2)})</span>
+                  )}
                 </p>
                 <button 
                   className={`${isSelected ? 'secondary-btn' : 'primary-btn'} select-btn`}

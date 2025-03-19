@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
 import './EventScraper.css';
-import { scrapeEventbriteUrl } from '../services/api';
+import { searchEvents } from '../services/api';
 
-function EventScraper({ onEventScraped, setLoading, setError }) {
-  const [url, setUrl] = useState('');
+function EventSearch({ onEventFound, setLoading, setError }) {
+  const [searchParams, setSearchParams] = useState({
+    keyword: '',
+    city: '',
+    startDateTime: '',
+    endDateTime: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!url) {
-      setError('Please enter an Eventbrite URL');
-      return;
-    }
-    
-    if (!url.includes('eventbrite.com/e/')) {
-      setError('Please enter a valid Eventbrite event URL');
+    if (!searchParams.keyword && !searchParams.city) {
+      setError('Please enter a keyword or city');
       return;
     }
     
@@ -24,35 +24,83 @@ function EventScraper({ onEventScraped, setLoading, setError }) {
       setLoading(true);
       setError('');
       
-      const event = await scrapeEventbriteUrl(url);
+      const events = await searchEvents(searchParams);
       
-      if (event) {
-        onEventScraped(event);
+      if (events && events.length > 0) {
+        onEventFound(events);
+      } else {
+        setError('No events found. Try different search criteria.');
       }
     } catch (err) {
-      setError('Failed to scrape event: ' + (err.response?.data?.message || err.message));
+      setError('Failed to search events: ' + (err.response?.data?.message || err.message));
     } finally {
       setIsSubmitting(false);
       setLoading(false);
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setSearchParams(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
-    <div className="event-scraper card">
-      <h2>Find an Event</h2>
-      <p className="scraper-description">
-        Paste an Eventbrite event URL to extract event details and create social media content.
+    <div className="event-search card">
+      <h2>Find Events</h2>
+      <p className="search-description">
+        Search for events by keyword, city, or date to create social media content.
       </p>
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="eventbrite-url">Eventbrite Event URL</label>
+          <label htmlFor="keyword">Keyword (Event name, artist, team, etc.)</label>
           <input
-            id="eventbrite-url"
-            type="url"
-            placeholder="https://www.eventbrite.com/e/event-name-tickets-123456789"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            id="keyword"
+            name="keyword"
+            type="text"
+            placeholder="Enter keywords..."
+            value={searchParams.keyword}
+            onChange={handleInputChange}
+            className="form-control"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="city">City</label>
+          <input
+            id="city"
+            name="city"
+            type="text"
+            placeholder="Enter city name..."
+            value={searchParams.city}
+            onChange={handleInputChange}
+            className="form-control"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="startDateTime">Start Date</label>
+          <input
+            id="startDateTime"
+            name="startDateTime"
+            type="date"
+            value={searchParams.startDateTime}
+            onChange={handleInputChange}
+            className="form-control"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="endDateTime">End Date</label>
+          <input
+            id="endDateTime"
+            name="endDateTime"
+            type="date"
+            value={searchParams.endDateTime}
+            onChange={handleInputChange}
             className="form-control"
           />
         </div>
@@ -62,21 +110,22 @@ function EventScraper({ onEventScraped, setLoading, setError }) {
           className="primary-btn"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Scraping...' : 'Scrape Event'}
+          {isSubmitting ? 'Searching...' : 'Search Events'}
         </button>
       </form>
       
-      <div className="scraper-note">
-        <p><strong>How it works:</strong> This tool extracts event information directly from Eventbrite event pages. 
-        Simply copy and paste the URL of any Eventbrite event to get started.</p>
-        <p><strong>Example URLs:</strong></p>
+      <div className="search-note">
+        <p><strong>How it works:</strong> This tool searches for events using the Ticketmaster API. 
+        You can search by keyword (event name, artist, team, etc.), city, and date range.</p>
+        <p><strong>Search tips:</strong></p>
         <ul>
-          <li>https://www.eventbrite.com/e/concert-name-tickets-123456789</li>
-          <li>https://www.eventbrite.com/e/conference-name-tickets-987654321</li>
+          <li>Enter a keyword to find specific events or artists</li>
+          <li>Specify a city to find local events</li>
+          <li>Use date range to find upcoming events</li>
         </ul>
       </div>
     </div>
   );
 }
 
-export default EventScraper; 
+export default EventSearch; 

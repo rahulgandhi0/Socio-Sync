@@ -1,10 +1,3 @@
-const { OpenAI } = require('openai');
-
-// Using the environment variable for OpenAI API key
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 // Mock captions for different event types
 const MOCK_EVENT_CAPTIONS = [
   "🔥 Don't miss out on {EVENT_TITLE}! Mark your calendars for {EVENT_DATE} and get ready for an unforgettable experience at {EVENT_VENUE}. Tickets selling fast! #MustAttend #EventOfTheYear",
@@ -76,59 +69,10 @@ function generateMockCaption(type = 'event', data = {}) {
  */
 async function generateCaption(data, type = 'event') {
   try {
-    let prompt;
-    
-    if (type === 'event') {
-      const { title, description, startDate, venue } = data;
-      prompt = `Generate an engaging and creative social media caption for the following event:
-      
-Event Title: ${title}
-Event Description: ${description || 'Not provided'}
-Event Date: ${startDate}
-Event Location: ${venue?.name || 'Not provided'}, ${venue?.city || 'Not provided'}
-
-The caption should be attention-grabbing, include relevant hashtags, and encourage people to attend the event. Keep it under 280 characters.`;
-    } else if (type === 'image') {
-      const { title, context } = data;
-      prompt = `Generate an engaging and creative social media caption for an image related to:
-      
-Image Title: ${title}
-Image Context: ${context || 'Not provided'}
-
-The caption should be attention-grabbing, include relevant hashtags, and be suitable for Instagram or Twitter. Keep it under 280 characters.`;
-    } else {
-      throw new Error('Invalid caption type');
-    }
-    
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are a social media expert who creates engaging captions for events and images. Your captions are creative, concise, and optimized for engagement."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        max_tokens: 150,
-        temperature: 0.7,
-      });
-      
-      return response.choices[0].message.content.trim();
-    } catch (apiError) {
-      console.error('OpenAI API error, using mock caption instead:', apiError);
-      
-      // Use mock caption as fallback with event details
-      return generateMockCaption(type, data);
-    }
-  } catch (error) {
-    console.error('Error generating caption with GPT:', error);
-    
-    // Use mock caption as final fallback
     return generateMockCaption(type, data);
+  } catch (error) {
+    console.error('Error generating caption:', error);
+    throw error;
   }
 }
 

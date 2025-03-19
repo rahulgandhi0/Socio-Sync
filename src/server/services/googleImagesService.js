@@ -1,8 +1,8 @@
 const axios = require('axios');
 
-// Using the provided Google API key and Search Engine ID
-const GOOGLE_API_KEY = 'AIzaSyCvb9bI_2XBr4yrt3Am8vKaFDZOT8todBE';
-const SEARCH_ENGINE_ID = 'a740c18060f64499a';
+// Using environment variables for Google API key and Search Engine ID
+const GOOGLE_API_KEY = process.env.GOOGLE_CUSTOM_SEARCH_API_KEY;
+const SEARCH_ENGINE_ID = process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_ID;
 const BASE_URL = 'https://www.googleapis.com/customsearch/v1';
 
 /**

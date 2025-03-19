@@ -6,7 +6,7 @@ const path = require('path');
 // Import routes
 const googleImagesRoutes = require('./routes/googleImages');
 const gptRoutes = require('./routes/gpt');
-const scraperRoutes = require('./routes/eventbriteScraper');
+const eventRoutes = require('./routes/ticketmaster');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api/images', googleImagesRoutes);
 app.use('/api/captions', gptRoutes);
-app.use('/api/scraper', scraperRoutes);
+app.use('/api/events', eventRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

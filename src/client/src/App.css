@@ -5,10 +5,12 @@
 }
 
 .app-header {
-  background-color: #4361ee;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
   color: white;
   padding: 30px 0;
   margin-bottom: 30px;
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
 }
 
 .app-header h1 {
@@ -67,8 +69,9 @@ main {
 }
 
 .step.active .step-number {
-  background-color: #4361ee;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
   color: white;
+  background-size: 150% 150%;
 }
 
 .step-text {
@@ -136,8 +139,8 @@ main {
 }
 
 .image-option.selected {
-  border-color: #5c6bc0;
-  box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.3);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
 }
 
 .image-option img {
@@ -153,7 +156,7 @@ main {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: #5c6bc0;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle));
   color: white;
   display: flex;
   align-items: center;
