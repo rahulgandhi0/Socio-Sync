@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import './EventScraper.css';  // We'll keep using the same CSS file for now
+import './EventSearch.css';
 import { searchEvents, getCities, getCategories } from '../services/api';
 
 function EventSearch({ onEventFound, setLoading, setError }) {
-  const [searchParams, setSearchParams] = useState({
-    city: '',
-    categoryId: '',
-    startDateTime: '',
-    endDateTime: ''
+  const [searchParams, setSearchParams] = useState(() => {
+    // Initialize from localStorage if available
+    const savedParams = localStorage.getItem('searchParams');
+    return savedParams ? JSON.parse(savedParams) : {
+      city: '',
+      categoryId: '',
+      startDateTime: '',
+      endDateTime: ''
+    };
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Get today's date in YYYY-MM-DD format for min date attribute
   const today = new Date().toISOString().split('T')[0];
   
@@ -34,6 +37,11 @@ function EventSearch({ onEventFound, setLoading, setError }) {
     { id: 'KZFzniwnSyZfZ7v7n1', name: 'Miscellaneous' }
   ];
 
+  // Save search params to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('searchParams', JSON.stringify(searchParams));
+  }, [searchParams]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchParams(prev => ({
@@ -44,7 +52,6 @@ function EventSearch({ onEventFound, setLoading, setError }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
     try {
       setLoading(true);
@@ -60,7 +67,6 @@ function EventSearch({ onEventFound, setLoading, setError }) {
       console.error(err);
     } finally {
       setLoading(false);
-      setIsSubmitting(false);
     }
   };
 
@@ -105,38 +111,39 @@ function EventSearch({ onEventFound, setLoading, setError }) {
           </select>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="startDateTime">Start Date</label>
-          <input
-            id="startDateTime"
-            name="startDateTime"
-            type="date"
-            min={today}
-            value={searchParams.startDateTime}
-            onChange={handleInputChange}
-            className="form-control"
-          />
-        </div>
+        <div className="date-selection-container">
+          <div className="date-column">
+            <label htmlFor="startDateTime">Start Date</label>
+            <input
+              type="date"
+              id="startDateTime"
+              name="startDateTime"
+              value={searchParams.startDateTime}
+              onChange={handleInputChange}
+              min={today}
+              className="form-control"
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="endDateTime">End Date</label>
-          <input
-            id="endDateTime"
-            name="endDateTime"
-            type="date"
-            min={searchParams.startDateTime || today}
-            value={searchParams.endDateTime}
-            onChange={handleInputChange}
-            className="form-control"
-          />
+          <div className="date-column">
+            <label htmlFor="endDateTime">End Date</label>
+            <input
+              type="date"
+              id="endDateTime"
+              name="endDateTime"
+              value={searchParams.endDateTime}
+              onChange={handleInputChange}
+              min={searchParams.startDateTime || today}
+              className="form-control"
+            />
+          </div>
         </div>
         
         <button 
           type="submit" 
           className="primary-btn"
-          disabled={isSubmitting}
         >
-          {isSubmitting ? 'Searching...' : 'Search Events'}
+          Search Events
         </button>
       </form>
     </div>

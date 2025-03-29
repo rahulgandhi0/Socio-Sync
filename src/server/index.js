@@ -7,6 +7,7 @@ const path = require('path');
 const googleImagesRoutes = require('./routes/googleImages');
 const gptRoutes = require('./routes/gpt');
 const eventRoutes = require('./routes/ticketmaster');
+const instagramRoutes = require('./routes/instagram');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/images', googleImagesRoutes);
 app.use('/api/captions', gptRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/instagram', instagramRoutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

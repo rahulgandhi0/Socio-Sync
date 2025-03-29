@@ -1,31 +1,76 @@
 import React, { useState } from 'react';
-import { generateCaption } from '../services/api';
 import './CaptionGenerator.css';
 
-const CaptionGenerator = ({ event, image, images = [], onCaptionGenerated, setLoading, setError }) => {
+const EVENT_CAPTIONS = [
+  "🔥 Don't miss out on {title}! Join us on {date} at {venue}. Tickets selling fast! #MustAttend #EventOfTheYear",
+  "✨ Join us for {title} on {date} at {venue}! Tag a friend you'd bring along to this amazing event. Limited spots available! #ExcitingEvent #GetYourTickets",
+  "🎉 The countdown begins for {title}! This is your chance to be part of something special on {date}. Early bird tickets available now! #SaveTheDate #CantWait",
+  "🚀 Ready for the experience of a lifetime? {title} is going to be epic! Secure your spot for {date} at {venue}. #DontMissOut #BookNow",
+  "⭐ The most anticipated event of the year is here! {title} at {venue} on {date}. Get your tickets before they're gone. #HotTickets #MustSee"
+];
+
+const IMAGE_CAPTIONS = [
+  "✨ Capturing moments that last a lifetime at {title}. What's your favorite memory from an event like this? #PerfectMoment #EventMagic",
+  "🔥 When the vibes are just right! Tag someone you'd bring to {title}. #GoodVibesOnly #EventLife",
+  "💫 Some experiences are worth every penny. {title} is definitely one of them! #BucketList #MustExperience",
+  "📸 Picture perfect moments from {title}. Double tap if you wish you were here! #EventGoals #InstaWorthy",
+  "🎭 Behind every great event is an even greater story. What would yours be at {title}? #EventStories #MemoriesMade"
+];
+
+const CaptionGenerator = ({ event, images = [], onCaptionGenerated, setLoading, setError }) => {
   const [captionType, setCaptionType] = useState('event');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [generatedCaption, setGeneratedCaption] = useState('');
 
-  const handleGenerateCaption = async () => {
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  const handleGenerateCaption = () => {
     try {
       setLoading(true);
       setError('');
       
-      let data;
+      const templates = captionType === 'event' ? EVENT_CAPTIONS : IMAGE_CAPTIONS;
+      const randomIndex = Math.floor(Math.random() * templates.length);
+      let caption = templates[randomIndex];
+
       if (captionType === 'event') {
-        data = event;
+        caption = caption
+          .replace(/{title}/g, event.title)
+          .replace(/{date}/g, formatDate(event.startDate))
+          .replace(/{venue}/g, event.venue?.name || 'the venue');
       } else {
-        data = images[selectedImageIndex] || image;
+        const title = images[selectedImageIndex].title || event.title;
+        caption = caption.replace(/{title}/g, title);
       }
-      
-      const response = await generateCaption(data, captionType);
-      onCaptionGenerated(response.caption);
+
+      setGeneratedCaption(caption);
     } catch (err) {
       setError('Failed to generate caption. Please try again.');
-      console.error(err);
+      console.error('Caption generation error:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNext = () => {
+    if (!generatedCaption) {
+      setError('Please generate a caption first');
+      return;
+    }
+    onCaptionGenerated(generatedCaption);
   };
 
   return (
@@ -62,7 +107,7 @@ const CaptionGenerator = ({ event, image, images = [], onCaptionGenerated, setLo
           <div className="image-selector-container">
             <h3>Choose Image for Caption</h3>
             <p className="image-selector-help">
-              Select which image to base your caption on. The AI will analyze this image to generate a relevant caption.
+              Select which image to base your caption on.
             </p>
             <div className="image-selector">
               {images.map((img, index) => (
@@ -72,7 +117,7 @@ const CaptionGenerator = ({ event, image, images = [], onCaptionGenerated, setLo
                   onClick={() => setSelectedImageIndex(index)}
                   title={`Image ${index + 1}`}
                 >
-                  <img src={img.link} alt={`Option ${index + 1}`} />
+                  <img src={img.croppedImage || img.link} alt={`Option ${index + 1}`} />
                   {selectedImageIndex === index && (
                     <div className="selected-indicator">✓</div>
                   )}
@@ -82,12 +127,36 @@ const CaptionGenerator = ({ event, image, images = [], onCaptionGenerated, setLo
           </div>
         )}
       </div>
-      <button 
-        className="primary-btn generate-btn"
-        onClick={handleGenerateCaption}
-      >
-        Generate Caption
-      </button>
+
+      {generatedCaption && (
+        <div className="generated-caption">
+          <h3>Generated Caption</h3>
+          <p>{generatedCaption}</p>
+          <button 
+            className="secondary-btn"
+            onClick={() => navigator.clipboard.writeText(generatedCaption)}
+          >
+            Copy to Clipboard
+          </button>
+        </div>
+      )}
+
+      <div className="button-container">
+        <button 
+          className="primary-btn generate-btn"
+          onClick={handleGenerateCaption}
+        >
+          Generate Caption
+        </button>
+        {generatedCaption && (
+          <button 
+            className="primary-btn next-btn"
+            onClick={handleNext}
+          >
+            Next: Prepare for Instagram
+          </button>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,98 +1,86 @@
 # SocioSync
 
-A full-stack web application that helps create engaging social media content by:
-1. Finding events from Ticketmaster's extensive event database
-2. Fetching high-quality images from Google Images API
-3. Generating social media captions using pre-defined templates
+SocioSync is a web application that helps you create and manage social media content for events. It integrates with Ticketmaster for event discovery, Google Images for visual content, and Instagram for publishing.
 
 ## Features
 
-- Search events by city, category, and date range
-- Filter for top concerts and comedy shows
-- Select and crop images for Instagram compatibility
-- Generate engaging social media captions
-- Responsive design for all devices
-
-## Tech Stack
-
-- Frontend: React.js
-- Backend: Node.js & Express
-- APIs: Ticketmaster API, Google Custom Search API
+- Search for events using Ticketmaster API
+- Find and upload images for your posts
+- Crop and adjust images for Instagram
+- Generate engaging captions
+- Publish directly to Instagram
+- Support for both single images and carousels
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- API keys from:
-  - [Ticketmaster Developer Portal](https://developer.ticketmaster.com/)
-  - [Google Cloud Console](https://console.cloud.google.com/)
-  - [Google Programmable Search Engine](https://programmablesearchengine.google.com/)
+- Instagram Business Account
+- Google Custom Search API credentials
+- Ticketmaster API key
 
-## Setup Instructions
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Server Port
+PORT=3001
+
+# Ticketmaster API
+TICKETMASTER_API_KEY=your_api_key
+
+# Google Custom Search
+GOOGLE_CUSTOM_SEARCH_API_KEY=your_api_key
+GOOGLE_CUSTOM_SEARCH_ENGINE_ID=your_engine_id
+
+# Instagram API
+INSTAGRAM_ACCESS_TOKEN=your_access_token
+INSTAGRAM_USER_ID=your_user_id
+```
+
+## Installation
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/SocioSync.git
-   cd SocioSync
-   ```
+```bash
+git clone https://github.com/yourusername/Socio-Sync.git
+cd Socio-Sync
+```
 
-2. Install dependencies for both server and client:
-   ```bash
-   npm install
-   cd src/client
-   npm install
-   cd ../..
-   ```
+2. Install dependencies:
+```bash
+npm install
+cd src/client
+npm install
+cd ../..
+```
 
-3. Set up environment variables:
-   - Copy `.env.example` to `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Open `.env` and add your API keys:
-     ```
-     PORT=3001
-     TICKETMASTER_API_KEY=your_ticketmaster_api_key
-     GOOGLE_CUSTOM_SEARCH_API_KEY=your_google_api_key
-     GOOGLE_CUSTOM_SEARCH_ENGINE_ID=your_search_engine_id
-     ```
+3. Start the development server:
+```bash
+# Start the backend server
+npm start
 
-4. Start the development server:
-   ```bash
-   npm run dev:full
-   ```
-   This will start both the backend server (port 3001) and frontend client (port 3000).
+# In a new terminal, start the client
+npm run client
+```
 
-## Production Deployment
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:3001
 
-1. Build the client:
-   ```bash
-   cd src/client
-   npm run build
-   ```
+## Usage
 
-2. Set environment variables in your production environment
-3. Start the server:
-   ```bash
-   npm start
-   ```
-
-## Security Notes
-
-- Never commit your `.env` file or expose API keys
-- The application uses environment variables for all sensitive data
-- API keys are only used server-side for security
-- Input validation is implemented for all API endpoints
+1. Search for an event using the event search feature
+2. Select or upload images for your post
+3. Crop and adjust images as needed
+4. Generate or write your caption
+5. Preview and publish to Instagram
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+[MIT](https://choosealicense.com/licenses/mit/) 

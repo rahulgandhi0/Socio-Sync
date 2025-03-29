@@ -6,6 +6,9 @@ import ImageSearch from './components/ImageSearch';
 import ImageList from './components/ImageList';
 import CaptionGenerator from './components/CaptionGenerator';
 import ImageCropper from './components/ImageCropper';
+import InstagramPublish from './components/InstagramPublish';
+import StatusScreen from './components/StatusScreen';
+import { prepareInstagramPost } from './services/instagramApi';
 
 function App() {
   const [step, setStep] = useState(1);
@@ -16,6 +19,8 @@ function App() {
   const [images, setImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [caption, setCaption] = useState('');
+  const [instagramStatus, setInstagramStatus] = useState(null);
+  const [showStatus, setShowStatus] = useState(false);
 
   const MAX_IMAGES = 8;
 
@@ -104,6 +109,7 @@ function App() {
 
   const handleCaptionGenerated = (generatedCaption) => {
     setCaption(generatedCaption);
+    setStep(5); // Move to Instagram publishing after caption
   };
 
   const handleBack = () => {
@@ -117,6 +123,9 @@ function App() {
     setSelectedEvent(null);
     setSelectedImages([]);
     setCaption('');
+    setInstagramStatus(null);
+    setError('');
+    setShowStatus(false);
   };
 
   const handleProceedToCaption = () => {
@@ -130,7 +139,23 @@ function App() {
 
   const handleImagesCropped = (croppedImages) => {
     setSelectedImages(croppedImages);
-    setStep(4); // Move to caption step after cropping
+    setStep(4); // Move to caption generation after cropping
+  };
+
+  const handleInstagramPrepare = async (params) => {
+    try {
+      setLoading(true);
+      setError('');
+      const status = await prepareInstagramPost(params);
+      setInstagramStatus(status);
+      setShowStatus(true);
+    } catch (err) {
+      setError('Failed to prepare Instagram post. Please try again.');
+      console.error(err);
+      setShowStatus(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const removeSelectedImage = (image) => {
@@ -149,210 +174,217 @@ function App() {
       </header>
 
       <main className="container">
-        <div className="steps-container">
-          <div className={`step ${step === 1 ? 'active' : ''}`}>
-            <span className="step-number">1</span>
-            <span className="step-text">Find Events</span>
-          </div>
-          <div className={`step ${step === 2 ? 'active' : ''}`}>
-            <span className="step-number">2</span>
-            <span className="step-text">Select Images</span>
-          </div>
-          <div className={`step ${step === 3 ? 'active' : ''}`}>
-            <span className="step-number">3</span>
-            <span className="step-text">Crop Images</span>
-          </div>
-          <div className={`step ${step === 4 ? 'active' : ''}`}>
-            <span className="step-number">4</span>
-            <span className="step-text">Generate Caption</span>
-          </div>
-        </div>
-
-        {error && <div className="error">{error}</div>}
-
-        {loading && (
-          <div className="loading">Loading...</div>
-        )}
-
-        {!loading && (
+        {!showStatus && (
           <>
-            {step === 1 && (
-              <>
-                <EventSearch
-                  onEventFound={handleEventsFound}
-                  setLoading={setLoading}
-                  setError={setError}
-                />
-                
-                {events.length > 0 && (
-                  <EventList
-                    events={events}
-                    onSelectEvent={handleEventSelect}
-                  />
-                )}
-              </>
+            <div className="steps-container">
+              <div className={`step ${step === 1 ? 'active' : ''}`}>
+                <span className="step-number">1</span>
+                <span className="step-text">Find Events</span>
+              </div>
+              <div className={`step ${step === 2 ? 'active' : ''}`}>
+                <span className="step-number">2</span>
+                <span className="step-text">Select Images</span>
+              </div>
+              <div className={`step ${step === 3 ? 'active' : ''}`}>
+                <span className="step-number">3</span>
+                <span className="step-text">Crop Images</span>
+              </div>
+              <div className={`step ${step === 4 ? 'active' : ''}`}>
+                <span className="step-number">4</span>
+                <span className="step-text">Generate Caption</span>
+              </div>
+              <div className={`step ${step === 5 ? 'active' : ''}`}>
+                <span className="step-number">5</span>
+                <span className="step-text">Publish to Instagram</span>
+              </div>
+            </div>
+
+            {error && <div className="error">{error}</div>}
+
+            {loading && (
+              <div className="loading">Loading...</div>
             )}
 
-            {step === 2 && selectedEvent && (
-              <>
-                <div className="navigation">
-                  <button className="secondary-btn" onClick={handleBack}>Back to Events</button>
-                  <button 
-                    className="primary-btn" 
-                    onClick={handleProceedToCaption} 
-                    disabled={selectedImages.length === 0}
-                  >
-                    Continue with {selectedImages.length} {selectedImages.length === 1 ? 'Image' : 'Images'}
-                  </button>
-                </div>
-                
-                <div className="selected-event card">
-                  <h2>{selectedEvent.title}</h2>
-                  <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
-                  {selectedEvent.venue && (
-                    <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
-                  )}
-                </div>
-                
-                <div className="image-selection-layout">
-                  <div className="image-selection-main">
-                    <ImageSearch 
-                      eventTitle={selectedEvent.title} 
-                      setImages={setImages} 
-                      setLoading={setLoading} 
-                      setError={setError} 
+            {!loading && (
+              <div className="step-content">
+                {step === 1 && (
+                  <>
+                    <EventSearch
+                      onEventFound={handleEventsFound}
+                      setLoading={setLoading}
+                      setError={setError}
                     />
                     
-                    {loading ? (
-                      <div className="loading"></div>
-                    ) : (
-                      <ImageList 
-                        images={images} 
-                        selectedImages={selectedImages}
-                        onSelectImage={handleImageSelect} 
-                        maxImages={MAX_IMAGES}
+                    {events.length > 0 && (
+                      <EventList
+                        events={events}
+                        onSelectEvent={handleEventSelect}
                       />
                     )}
-                  </div>
-                  
-                  {selectedImages.length > 0 && (
-                    <div className="image-selection-sidebar">
-                      <div className="selected-images-preview card">
-                        <h3>
-                          Selected Images 
-                          <span className="selected-images-count">{selectedImages.length}/{MAX_IMAGES}</span>
-                        </h3>
+                  </>
+                )}
+
+                {step === 2 && selectedEvent && (
+                  <>
+                    <div className="navigation">
+                      <button className="secondary-btn" onClick={handleBack}>Back to Events</button>
+                      <button 
+                        className="primary-btn" 
+                        onClick={handleProceedToCaption} 
+                        disabled={selectedImages.length === 0}
+                      >
+                        Continue with {selectedImages.length} {selectedImages.length === 1 ? 'Image' : 'Images'}
+                      </button>
+                    </div>
+                    
+                    <div className="selected-event card">
+                      <h2>{selectedEvent.title}</h2>
+                      <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
+                      {selectedEvent.venue && (
+                        <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
+                      )}
+                    </div>
+                    
+                    <div className="image-selection-layout">
+                      <div className="image-selection-main">
+                        <ImageSearch 
+                          eventTitle={selectedEvent.title} 
+                          setImages={setImages} 
+                          setLoading={setLoading} 
+                          setError={setError}
+                          onProceed={handleProceedToCaption}
+                        />
+                        
+                        {loading ? (
+                          <div className="loading"></div>
+                        ) : (
+                          <ImageList 
+                            images={images} 
+                            selectedImages={selectedImages}
+                            onSelectImage={handleImageSelect} 
+                            maxImages={MAX_IMAGES}
+                          />
+                        )}
+                      </div>
+                      
+                      {selectedImages.length > 0 && (
+                        <div className="image-selection-sidebar">
+                          <div className="selected-images-preview card">
+                            <h3>
+                              Selected Images 
+                              <span className="selected-images-count">{selectedImages.length}/{MAX_IMAGES}</span>
+                            </h3>
+                            <div className="selected-images-grid">
+                              {selectedImages.map((image, index) => (
+                                <div key={index} className="selected-image-thumbnail">
+                                  <img src={image.link} alt={image.title} />
+                                  <button 
+                                    className="remove-image-btn" 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      removeSelectedImage(image);
+                                    }}
+                                    title="Remove image"
+                                  >
+                                    ✕
+                                  </button>
+                                  <div className="checkmark-indicator">✓</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {step === 3 && selectedEvent && selectedImages.length > 0 && (
+                  <>
+                    <div className="navigation">
+                      <button className="secondary-btn" onClick={handleBack}>Back to Images</button>
+                      <button className="secondary-btn" onClick={handleReset}>Start Over</button>
+                    </div>
+                    <div className="selected-content">
+                      <div className="selected-event card">
+                        <h2>{selectedEvent.title}</h2>
+                        <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
+                        {selectedEvent.venue && (
+                          <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
+                        )}
+                      </div>
+                      <div className="selected-images-grid-container card">
+                        <h3>Selected Images</h3>
                         <div className="selected-images-grid">
                           {selectedImages.map((image, index) => (
                             <div key={index} className="selected-image-thumbnail">
                               <img src={image.link} alt={image.title} />
-                              <button 
-                                className="remove-image-btn" 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeSelectedImage(image);
-                                }}
-                                title="Remove image"
-                              >
-                                ✕
-                              </button>
                               <div className="checkmark-indicator">✓</div>
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
-              </>
-            )}
-
-            {step === 3 && selectedEvent && selectedImages.length > 0 && (
-              <>
-                <div className="navigation">
-                  <button className="secondary-btn" onClick={handleBack}>Back to Images</button>
-                  <button className="secondary-btn" onClick={handleReset}>Start Over</button>
-                </div>
-                <div className="selected-content">
-                  <div className="selected-event card">
-                    <h2>{selectedEvent.title}</h2>
-                    <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
-                    {selectedEvent.venue && (
-                      <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
-                    )}
-                  </div>
-                  <div className="selected-images-grid-container card">
-                    <h3>Selected Images</h3>
-                    <div className="selected-images-grid">
-                      {selectedImages.map((image, index) => (
-                        <div key={index} className="selected-image-thumbnail">
-                          <img src={image.link} alt={image.title} />
-                          <div className="checkmark-indicator">✓</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <ImageCropper 
-                  images={selectedImages}
-                  onImagesCropped={handleImagesCropped}
-                />
-              </>
-            )}
-
-            {step === 4 && selectedEvent && selectedImages.length > 0 && (
-              <>
-                <div className="navigation">
-                  <button className="secondary-btn" onClick={() => setStep(3)}>Back to Crop</button>
-                  <button className="secondary-btn" onClick={handleReset}>Start Over</button>
-                </div>
-                <div className="selected-content">
-                  <div className="selected-event card">
-                    <h2>{selectedEvent.title}</h2>
-                    <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
-                    {selectedEvent.venue && (
-                      <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
-                    )}
-                  </div>
-                  <div className="selected-images-grid-container card">
-                    <h3>Selected Images</h3>
-                    <div className="selected-images-grid">
-                      {selectedImages.map((image, index) => (
-                        <div key={index} className="selected-image-thumbnail">
-                          <img src={image.link} alt={image.title} />
-                          <div className="checkmark-indicator">✓</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <CaptionGenerator 
-                  event={selectedEvent} 
-                  image={selectedImages[0]} // Using the first image for caption generation
-                  images={selectedImages}
-                  onCaptionGenerated={handleCaptionGenerated} 
-                  setLoading={setLoading} 
-                  setError={setError} 
-                />
-                {loading ? (
-                  <div className="loading"></div>
-                ) : caption && (
-                  <div className="caption-result card">
-                    <h3>Generated Caption</h3>
-                    <div className="caption-box">
-                      <p>{caption}</p>
-                    </div>
-                    <button 
-                      className="primary-btn"
-                      onClick={() => navigator.clipboard.writeText(caption)}
-                    >
-                      Copy to Clipboard
-                    </button>
-                  </div>
+                    <ImageCropper 
+                      images={selectedImages}
+                      onImagesCropped={handleImagesCropped}
+                    />
+                  </>
                 )}
-              </>
+
+                {step === 4 && selectedEvent && selectedImages.length > 0 && (
+                  <>
+                    <div className="navigation">
+                      <button className="secondary-btn" onClick={handleBack}>Back to Cropping</button>
+                    </div>
+                    
+                    <div className="selected-content">
+                      <div className="selected-event card">
+                        <h2>{selectedEvent.title}</h2>
+                        <p><strong>Date:</strong> {new Date(selectedEvent.startDate).toLocaleDateString()}</p>
+                        {selectedEvent.venue && (
+                          <p><strong>Location:</strong> {selectedEvent.venue.name}{selectedEvent.venue.city ? `, ${selectedEvent.venue.city}` : ''}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <CaptionGenerator 
+                      event={selectedEvent} 
+                      images={selectedImages}
+                      onCaptionGenerated={handleCaptionGenerated} 
+                      setLoading={setLoading} 
+                      setError={setError} 
+                    />
+                  </>
+                )}
+
+                {step === 5 && selectedEvent && selectedImages.length > 0 && (
+                  <>
+                    <div className="navigation">
+                      <button className="secondary-btn" onClick={handleBack}>Back to Caption</button>
+                      <button className="secondary-btn" onClick={handleReset}>Start Over</button>
+                    </div>
+                    
+                    <InstagramPublish
+                      selectedImages={selectedImages}
+                      selectedEvent={selectedEvent}
+                      caption={caption}
+                      onPublish={handleInstagramPrepare}
+                      setError={setError}
+                    />
+                  </>
+                )}
+              </div>
             )}
           </>
+        )}
+
+        {showStatus && (
+          <StatusScreen
+            status={instagramStatus}
+            error={error}
+            onReset={handleReset}
+          />
         )}
       </main>
 

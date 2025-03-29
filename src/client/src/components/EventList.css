@@ -1,28 +1,41 @@
+.event-list {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .event-list h2 {
   margin-bottom: 20px;
+  color: #333;
 }
 
 .event-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  margin-top: 20px;
 }
 
 .event-card {
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: white;
+  border-radius: 8px;
   overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .event-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .event-image {
+  width: 100%;
   height: 180px;
   overflow: hidden;
-  margin: -20px -20px 15px -20px;
 }
 
 .event-image img {
@@ -31,34 +44,71 @@
   object-fit: cover;
 }
 
+.event-details {
+  padding: 15px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .event-details h3 {
-  margin-bottom: 10px;
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: 1.1rem;
+  margin: 0 0 10px 0;
+  color: #333;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.event-date, .event-location {
-  margin-bottom: 10px;
+.event-date {
+  font-size: 0.9rem;
   color: #666;
-  font-size: 14px;
+  margin: 5px 0;
+}
+
+.event-location {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 5px 0;
+  flex-grow: 1;
 }
 
 .select-btn {
-  margin-top: 10px;
   width: 100%;
+  padding: 8px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.select-btn:hover {
+  background-color: #0056b3;
 }
 
 .event-list-empty {
   text-align: center;
-  padding: 40px 20px;
+  padding: 40px;
+  color: #666;
 }
 
-@media (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .event-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
   .event-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .event-image {
+    height: 200px;
   }
 } 
