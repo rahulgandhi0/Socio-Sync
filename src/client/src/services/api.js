@@ -51,10 +51,10 @@ export const getEventById = async (eventId) => {
 };
 
 // Image API calls
-export const getImages = async (query, aspectRatio, quality) => {
+export const getImages = async (query, aspectRatio) => {
   try {
     const response = await api.get('/api/images/search', {
-      params: { query, aspectRatio, quality }
+      params: { query, aspectRatio }
     });
     return response.data;
   } catch (error) {

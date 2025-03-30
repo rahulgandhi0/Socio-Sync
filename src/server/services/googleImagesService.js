@@ -13,7 +13,7 @@ const BASE_URL = 'https://www.googleapis.com/customsearch/v1';
  */
 async function searchImages(query, imageRequirements = {}) {
   try {
-    const { aspectRatio = 'wide', quality = 'high' } = imageRequirements;
+    const { aspectRatio = 'wide' } = imageRequirements;
     
     // Map aspect ratio to Google's imgSize parameter
     let imgSize;
@@ -27,16 +27,6 @@ async function searchImages(query, imageRequirements = {}) {
       imgSize = 'xlarge'; // default
     }
     
-    // Map quality to Google's imgType parameter
-    let imgType;
-    if (quality === 'high') {
-      imgType = 'photo';
-    } else if (quality === 'medium') {
-      imgType = 'clipart';
-    } else {
-      imgType = 'photo'; // default
-    }
-    
     const response = await axios.get(BASE_URL, {
       params: {
         key: GOOGLE_API_KEY,
@@ -44,9 +34,9 @@ async function searchImages(query, imageRequirements = {}) {
         q: query,
         searchType: 'image',
         imgSize: imgSize,
-        imgType: imgType,
+        imgType: 'photo', // Always use high quality photos
         num: 10, // Get top 10 images
-        safe: 'active'
+        safe: 'off' // Disable safe search
       }
     });
     

@@ -18,7 +18,7 @@ const ImageSearch = ({ eventTitle, setImages, setLoading, setError, onProceed })
     try {
       setLoading(true);
       setError('');
-      const images = await getImages(query, aspectRatio, 'high');
+      const images = await getImages(query, aspectRatio);
       setImages(images);
       
       if (images.length === 0) {

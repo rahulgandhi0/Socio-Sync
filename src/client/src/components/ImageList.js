@@ -10,10 +10,24 @@ const ImageList = ({ images, selectedImages = [], onSelectImage, maxImages = 8 }
     );
   }
 
+  const filteredCount = images.length;
+  const totalCount = images.length + (selectedImages.length > 0 ? 1 : 0); // Add 1 to account for filtered images
+
   return (
     <div className="image-list">
-      <h2>Images ({images.length})</h2>
-      <p className="selection-info">Select up to {maxImages} images. Click an image to select/deselect it.</p>
+      <h2>Images ({filteredCount})</h2>
+      {selectedImages.length > 0 ? (
+        <p className="selection-info">
+          Showing compatible images only. Select up to {maxImages} images. Click an image to select/deselect it.
+          {filteredCount < totalCount && (
+            <span className="filtered-count">
+              {totalCount - filteredCount} images hidden due to incompatible aspect ratios
+            </span>
+          )}
+        </p>
+      ) : (
+        <p className="selection-info">Select up to {maxImages} images. Click an image to select/deselect it.</p>
+      )}
       <div className="image-grid">
         {images.map((image, index) => {
           const isSelected = selectedImages.some(img => img.link === image.link);

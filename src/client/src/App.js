@@ -46,7 +46,7 @@ function App() {
       const isAlreadySelected = prevSelectedImages.some(img => img.link === image.link);
       
       if (isAlreadySelected) {
-        // If already selected, remove it
+        // If already selected, remove it and show all images again
         return prevSelectedImages.filter(img => img.link !== image.link);
       } else if (prevSelectedImages.length < MAX_IMAGES) {
         // Check if the aspect ratios are compatible for Instagram
@@ -104,6 +104,31 @@ function App() {
         setTimeout(() => setError(''), 3000);
         return prevSelectedImages;
       }
+    });
+  };
+
+  // Add new function to filter images based on selected images
+  const getFilteredImages = () => {
+    if (selectedImages.length === 0) {
+      return images; // Show all images if none selected
+    }
+
+    const firstSelectedImage = selectedImages[0];
+    const firstImageRatio = firstSelectedImage.width / firstSelectedImage.height;
+
+    return images.filter(image => {
+      if (selectedImages.some(img => img.link === image.link)) {
+        return true; // Always show selected images
+      }
+
+      const imageRatio = image.width / image.height;
+      
+      // Check if ratio is compatible with first selected image
+      return (
+        (Math.abs(firstImageRatio - 1.0) <= 0.15 && Math.abs(imageRatio - 1.0) <= 0.15) || // Both square
+        (Math.abs(firstImageRatio - 0.8) <= 0.15 && Math.abs(imageRatio - 0.8) <= 0.15) || // Both portrait
+        Math.abs(firstImageRatio - imageRatio) <= 0.15 // Generally close ratios
+      );
     });
   };
 
@@ -259,7 +284,7 @@ function App() {
                           <div className="loading"></div>
                         ) : (
                           <ImageList 
-                            images={images} 
+                            images={getFilteredImages()} 
                             selectedImages={selectedImages}
                             onSelectImage={handleImageSelect} 
                             maxImages={MAX_IMAGES}
